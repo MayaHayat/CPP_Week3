@@ -23,6 +23,9 @@ class Player {
 
         bool winner ;
 
+        stack <Card> playerstack;
+
+
     
     public:
         //Empty constructor - not default since there's another one
@@ -41,7 +44,17 @@ class Player {
         int getNumOfCardsWon();
         void setNumOfCardsWon(int num);
     
-        stack <Card> playerstack;
+        // stack <Card> playerstack;
+
+        bool emptyStack();
+
+        void popStack();
+
+        Card topStack();
+
+        int stackSizeP();
+
+        void pushIntoStack( Card card1);
 
 
         

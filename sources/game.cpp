@@ -18,9 +18,9 @@ void initializeStack(vector <Card> &gamestack) {
 void divideCards(Player &pl1, Player &pl2, vector <Card> &gamestack){
     for (size_t i = 0; i < 52; ++i) {
         if (i % 2 == 0)
-            pl1.playerstack.push(gamestack[i]);
+            pl1.pushIntoStack(gamestack[i]);
         else
-            pl2.playerstack.push(gamestack[i]);
+            pl2.pushIntoStack(gamestack[i]);
     }
 
 }
@@ -83,152 +83,128 @@ void Game :: playTurn(){
         printLastTurn();
         return;
     }
-        Card c1 = pl1.playerstack.top();
-        Card c2 = pl2.playerstack.top();
-        pl1.playerstack.pop();
-        pl2.playerstack.pop();
+    Card c1 = pl1.topStack();
+    Card c2 = pl2.topStack();
+    pl1.popStack();
+    pl2.popStack();
 
-        cout << c1.getNumber() << " c1 and c2: " << c2.getNumber() << " " << pl1.playerstack.size() << endl;
-        string suit1 = c1.getSuit();
-        string suit2 = c2.getSuit();
-        string toPush = this -> pl1.getName() + " played " ;//+ c1.getNumber() <  " " << suit1 <<"\n" << this -> pl2.getName() << " played " << c2.getNumber() << " " << suit2;
-        this->log.push_back(toPush);
+    cout << c1.getNumber() << " c1 and c2: " << c2.getNumber() << " " << pl1.stacksize() << endl;
+    string suit1 = c1.getSuit();
+    string suit2 = c2.getSuit();
+    string toPush = this -> pl1.getName() + " played " ;//+ c1.getNumber() <  " " << suit1 <<"\n" << this -> pl2.getName() << " played " << c2.getNumber() << " " << suit2;
+    this->log.push_back(toPush);
 
-        // Ace wins all but 2
-        if (c1.getNumber() == 1 && c2.getNumber() != 2){
-            pl1.setNumWins(pl1.getNumWins()+1);
-            // pl1 which is the winner takes both cards
-            pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + 2);
+    // Ace wins all but 2
+    if (c1.getNumber() == 1 && c2.getNumber() != 2){
+        pl1.setNumWins(pl1.getNumWins()+1);
+        // pl1 which is the winner takes both cards
+        pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + 2);
             
-        }
+    }
 
-        // Ace wins all but 2
-        else if (c1.getNumber() != 2 && c2.getNumber() == 1){
-            pl2.setNumWins(pl2.getNumWins()+1);
-            // pl2 which is the winner takes both cards
-            pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + 2);
-        }
+    // Ace wins all but 2
+    else if (c1.getNumber() != 2 && c2.getNumber() == 1){
+        pl2.setNumWins(pl2.getNumWins()+1);
+        // pl2 which is the winner takes both cards
+        pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + 2);
+    }
 
-        // Else if pl1 wins the round:
-        else if (c1.getNumber() > c2.getNumber() && c2.getNumber() != 1){
-            pl1.setNumWins(pl1.getNumWins()+1);
-            // pl1 which is the winner takes both cards
-            pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + 2);
-        }
+    // Else if pl1 wins the round:
+    else if (c1.getNumber() > c2.getNumber()){
+        pl1.setNumWins(pl1.getNumWins()+1);
+        // pl1 which is the winner takes both cards
+        pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + 2);
+    }
 
-        // If pl2 wins the round:
-        else if (c1.getNumber() < c2.getNumber() && c1.getNumber() != 1){
-            pl2.setNumWins(pl2.getNumWins()+1);
-            // pl2 which is the winner takes both cards
-            pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + 2);
-        }
+    // If pl2 wins the round:
+    else if (c1.getNumber() < c2.getNumber()){
+        pl2.setNumWins(pl2.getNumWins()+1);
+        // pl2 which is the winner takes both cards
+        pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + 2);
+    }
         
-        else {
-            vector <Card> adding; // cards that we put on table
-            int NumOfCardsAddingUp = 2;
-            while (c1.getNumber() == c2.getNumber()){
+    else {
+        vector <Card> adding; // cards that we put on table
+        while (c1.getNumber() == c2.getNumber()){
 
-                // if cannot do war
-                if (this -> pl1.stacksize() < 2 && this -> pl2.stacksize() < 2 ){
+            // if cannot do war
+            if (this -> pl1.stacksize() < 2 && this -> pl2.stacksize() < 2 ){
                     
-                    pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + pl1.stacksize()+1);
-                    pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + pl1.stacksize()+1);
-                    if (!pl1.playerstack.empty()) {
-                        pl1.playerstack.pop();
+                pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + pl1.stacksize()+1);
+                pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + pl1.stacksize()+1);
+                if (!pl1.emptyStack()) {
+                    pl1.popStack();
+                }
+                if (!pl2.emptyStack()) {
+                    pl2.popStack();
+                }
+                gameIsOver = true; 
+                break;
+            }
+
+            // else begin war:
+            adding.push_back(c1);
+            adding.push_back(c2);
+            cout << adding.size() << " adding" << endl;
+            c1 = this -> pl1.topStack();
+            c2 = this -> pl2.topStack();
+            adding.push_back(c1); // the upside down card
+            adding.push_back(c2); // the upside down card
+            cout << adding.size() << " adding" << endl;
+            this -> pl1.popStack();
+            this -> pl2.popStack();
+            c1 = this -> pl1.topStack();
+            c2 = this -> pl2.topStack();
+            this -> pl1.popStack();
+            this -> pl2.popStack();
+            cout << c1.getNumber() << " c1 and c2: " << c2.getNumber() << " " << pl1.stacksize() << endl;
+            adding.push_back(c1); 
+            adding.push_back(c2);
+            cout << adding.size() << " adding" << endl;
+            cout << " ---------DRAW---------" << endl;
+
+
+            // Ace wins all but 2
+            if (c1.getNumber() == 1 && c2.getNumber() != 2){
+                pl1.setNumWins(pl1.getNumWins()+1);
+                // pl1 which is the winner takes both cards
+                int toAdd = adding.size();
+                pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + toAdd);
+                if (!adding.empty()){
+                    adding.pop_back();
+                }                    
+            }
+
+                // Ace wins all but 2
+                else if (c1.getNumber() != 2 && c2.getNumber() == 1){
+                    pl2.setNumWins(pl2.getNumWins()+1);
+                    // pl2 which is the winner takes both cards
+                    int toAdd = adding.size();
+                    pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + toAdd);
+                    if (!adding.empty()){
+                        adding.pop_back();
                     }
-                    if (!pl2.playerstack.empty()) {
-                        pl2.playerstack.pop();
-                    }
-                    gameIsOver = true; 
-                    break;
                 }
 
-                // else begin war:
-                adding.push_back(c1);
-                adding.push_back(c2);
-                cout << adding.size() << " adding" << endl;
-                c1 = this -> pl1.playerstack.top();
-                c2 = this -> pl2.playerstack.top();
-                adding.push_back(c1); // the upside down card
-                adding.push_back(c2); // the upside down card
-                cout << adding.size() << " adding" << endl;
-                this -> pl1.playerstack.pop();
-                this -> pl2.playerstack.pop();
-                c1 = this -> pl1.playerstack.top();
-                c2 = this -> pl2.playerstack.top();
-                this -> pl1.playerstack.pop();
-                this -> pl2.playerstack.pop();
-                cout << c1.getNumber() << " c1 and c2: " << c2.getNumber() << " " << pl1.playerstack.size() << endl;
-                break;
-                adding.push_back(c1); 
-                adding.push_back(c2);
-                cout << adding.size() << " adding" << endl;
-                NumOfCardsAddingUp += 4;
-                cout << " ---------DRAW---------" << endl;
-                //cout << NumOfCardsAddingUp << "  adding up  " << endl;
-
-
-                // // Ace wins all but 2
-                // if (c1.getNumber() == 1 && c2.getNumber() != 2){
-                //     pl1.setNumWins(pl1.getNumWins()+1);
-                //     // pl1 which is the winner takes both cards
-                //     int toAdd = adding.size();
-                //     pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + toAdd);
-                //     if (!adding.empty()){
-                //         adding.pop_back();
-                //     }
-                    
-                // }
-
-                // // Ace wins all but 2
-                // else if (c1.getNumber() != 2 && c2.getNumber() == 1){
-                //     pl2.setNumWins(pl2.getNumWins()+1);
-                //     // pl2 which is the winner takes both cards
-                //     int toAdd = adding.size();
-                //     pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + toAdd);
-                //     if (!adding.empty()){
-                //         adding.pop_back();
-                //     }
-                // }
-
-                // // Else if pl1 wins the round:
-                // else if (c1.getNumber() > c2.getNumber() && c2.getNumber() != 1){
-                //     pl1.setNumWins(pl1.getNumWins()+1);
-                //     // pl1 which is the winner takes both cards
-                //     int toAdd = adding.size();
-                //     pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + toAdd);
-                //     if (!adding.empty()){
-                //         adding.pop_back();
-                //     }
-                // }
-
-                // // If pl2 wins the round:
-                // else if (c1.getNumber() < c2.getNumber() && c1.getNumber() != 1){
-                //     pl2.setNumWins(pl2.getNumWins()+1);
-                //     // pl2 which is the winner takes both cards
-                //     int toAdd = adding.size();
-                //     pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + toAdd);
-                //     if (!adding.empty()){
-                //         adding.pop_back();
-                //     }
-                // }
-
-
-
-
-                if (pl1.stacksize() == 0 && pl2.stacksize() == 0 && c1.getNumber() == c2.getNumber() && adding.size() < 6){
-                    gameIsOver = true;
-                    pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + NumOfCardsAddingUp/2);
-                    pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + NumOfCardsAddingUp/2);
-
-                    if (pl1.getNumOfCardsWon() > pl2.getNumOfCardsWon()){
-                        cout << pl1.getName() << " won!" <<  pl1.cardesTaken() << endl;
+                // Else if pl1 wins the round:
+                else if (c1.getNumber() > c2.getNumber() && c2.getNumber() != 1){
+                    pl1.setNumWins(pl1.getNumWins()+1);
+                    // pl1 which is the winner takes both cards
+                    int toAdd = adding.size();
+                    pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + toAdd);
+                    if (!adding.empty()){
+                        adding.pop_back();
                     }
-                    else if (pl1.getNumOfCardsWon() < pl2.getNumOfCardsWon()){
-                        cout << pl2.getName() << " won! " <<  pl2.cardesTaken() <<endl;
-                    }
-                    else{
-                        cout << " Game ended with a tie, both players have the same number of cards in stack" << endl;
+                }
+
+                // If pl2 wins the round:
+                else if (c1.getNumber() < c2.getNumber() && c1.getNumber() != 1){
+                    pl2.setNumWins(pl2.getNumWins()+1);
+                    // pl2 which is the winner takes both cards
+                    int toAdd = adding.size();
+                    pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + toAdd);
+                    if (!adding.empty()){
+                        adding.pop_back();
                     }
                 }
 
@@ -243,37 +219,21 @@ void Game :: playTurn(){
                 }
 
 
-                if (pl1.stacksize() > 0 && pl2.stacksize() > 0){
-                    c1 = this -> pl1.playerstack.top();
-                    c2 = this -> pl2.playerstack.top();
-                    pl1.playerstack.pop();
-                    pl2.playerstack.pop();
-                    //NumOfCardsAddingUp +=2;
-                }
             }
 
-            
-            if (c1.getNumber() > c2.getNumber()){
-                this ->pl1.setNumWins(pl1.getNumWins()+1);
-                this->pl1.setNumOfCardsWon(this->pl1.getNumOfCardsWon()+ NumOfCardsAddingUp);
-                cout << pl1.stacksize() << " " << pl1.cardesTaken() << " " << pl2.stacksize() << " " << pl2.cardesTaken() << endl;
-                }
-            else if(c1.getNumber() < c2.getNumber()){
-                this ->pl2.setNumWins(pl2.getNumWins()+1);
-                this ->pl2.setNumOfCardsWon(this->pl2.getNumOfCardsWon()+ NumOfCardsAddingUp);
-                cout << pl1.stacksize() << " " << pl1.cardesTaken() << " " << pl2.stacksize() << " " << pl2.cardesTaken() << endl;
-
-            }
 
             if (pl1.stacksize() == 0 && pl2.stacksize() == 0){
             gameIsOver = true;
             if (pl1.getNumOfCardsWon() > pl2.getNumOfCardsWon()){
+                cout << pl1.getNumOfCardsWon() << " " << pl2.getNumOfCardsWon() << endl;
                 cout << pl1.getName() << " won!" << endl;
             }
             else if (pl1.getNumOfCardsWon() < pl2.getNumOfCardsWon()){
+                cout << pl1.getNumOfCardsWon() << " " << pl2.getNumOfCardsWon() << endl;
                 cout << pl2.getName() << " won!" << endl;
             }
             else{
+                cout << pl1.getNumOfCardsWon() << " " << pl2.getNumOfCardsWon() << endl;
                 cout << " Game ended with a tie, both players have the same number of cards in stack" << endl;
             }
         }

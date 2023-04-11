@@ -44,3 +44,23 @@ void Player :: setNumWins(int numOfWins){
 void Player :: setNumOfCardsWon(int num){
     this -> numCardsWon = num;
 }
+
+
+//------------------------------------------
+
+bool Player :: emptyStack(){
+    return this-> playerstack.empty();
+}
+
+
+void Player :: popStack(){
+    this->playerstack.pop();
+}
+
+Card Player :: topStack(){
+    return this ->playerstack.top();
+}
+
+void Player :: pushIntoStack( Card card1){
+    this ->playerstack.push(card1);
+}
