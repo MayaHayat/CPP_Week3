@@ -18,8 +18,8 @@ class Game {
     //All are private by default, wrote this so it's easier to understand
     private: 
         
-        Player &p1;
-        Player &p2;
+        Player &pl1;
+        Player &pl2;
         
         vector <string> log; // used in order to keep what happens in each round
         vector <Card> gamestack; // initially would contain 52 cards, need to be shuffled before each game
@@ -33,7 +33,7 @@ class Game {
 
         //Empty constructor - not default since there's another one
         // Parametized constructor
-        Game(Player &p1, Player &p2);
+        Game(Player &pl1, Player &pl2);
 
         void setPlayers(Player, Player);
         
