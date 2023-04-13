@@ -37,8 +37,8 @@ Game::Game(Player &pl1, Player &pl2) : pl1(pl1), pl2(pl2){
     
     //cout << gamestack.size() <<  " gamestack size " << endl;
 
-
-    //std::random_shuffle(this -> gamestack.begin(), this -> gamestack.begin());
+    // The shuffle function was taken from:  https://en.cppreference.com/w/cpp/algorithm/random_shuffle
+    
     random_device random;
     mt19937 g(random());
 
