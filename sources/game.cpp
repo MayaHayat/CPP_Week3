@@ -35,7 +35,7 @@ Game::Game(Player &pl1, Player &pl2) : pl1(pl1), pl2(pl2){
 
     initializeStack(this -> gamestack);
     
-    cout << gamestack.size() <<  " gamestack size " << endl;
+    //cout << gamestack.size() <<  " gamestack size " << endl;
 
 
     //std::random_shuffle(this -> gamestack.begin(), this -> gamestack.begin());
@@ -51,11 +51,6 @@ Game::Game(Player &pl1, Player &pl2) : pl1(pl1), pl2(pl2){
 
     divideCards(this ->pl1, this ->pl2, gamestack);
 
-    // cout << pl1.stacksize() <<  " pl1 stacksize " << endl;
-    // cout << pl2.stacksize() <<  " pl2 stacksize " << endl;
-    // cout << pl1.cardesTaken() <<  " pl1 cardstaken " << endl;
-    // cout << pl2.cardesTaken() <<  " pl2 cardstaken " << endl;
-
 
     // Initializing the remaining fields:
     this -> numOfDraws = 0;
@@ -66,7 +61,7 @@ Game::Game(Player &pl1, Player &pl2) : pl1(pl1), pl2(pl2){
 
 void Game :: playTurn(){
     
-    cout << pl1.stacksize() << " " << pl1.cardesTaken() << " " << pl2.stacksize() << " " << pl2.cardesTaken() << endl;
+    //cout << pl1.stacksize() << " " << pl1.cardesTaken() << " " << pl2.stacksize() << " " << pl2.cardesTaken() << endl;
 
     // Make sure game is valid before playing :
     if (gameIsOver){
@@ -88,10 +83,33 @@ void Game :: playTurn(){
     pl1.popStack();
     pl2.popStack();
 
-    cout << c1.getNumber() << " c1 and c2: " << c2.getNumber() << " " << pl1.stacksize() << endl;
+    //cout << c1.getNumber() << " c1 and c2: " << c2.getNumber() << " " << pl1.stacksize() << endl;
     string suit1 = c1.getSuit();
     string suit2 = c2.getSuit();
-    string toPush = this -> pl1.getName() + " played " ;//+ c1.getNumber() <  " " << suit1 <<"\n" << this -> pl2.getName() << " played " << c2.getNumber() << " " << suit2;
+    string num1 = std :: to_string(c1.getNumber()) + " of ";
+    string num2 = std :: to_string(c2.getNumber()) + " of ";
+    string winner = " ";
+
+    if (c1.getNumber() == 1 && c2.getNumber() != 2){
+        winner = this->pl2.getName() + " wins!";
+    }
+
+    else if (c2.getNumber() == 1 && c1.getNumber() != 2){
+        winner = this->pl1.getName() + " wins!";
+    }
+
+    else if (c1.getNumber() > c2.getNumber()){
+        winner = this->pl1.getName() + " wins!";
+    }
+
+    else if (c1.getNumber() < c2.getNumber()){
+        winner = this->pl2.getName()+ " wins!";
+    }
+    
+    else if (c1.getNumber() == c2.getNumber()){
+        winner = "-> Draw!";
+    }
+    string toPush = this -> pl1.getName() + " played "+ num1 + suit1 + " and " + this ->pl2.getName() + " played " + num2 + suit2 + " " + winner ;
     this->log.push_back(toPush);
 
     // Ace wins all but 2
@@ -99,6 +117,7 @@ void Game :: playTurn(){
         pl1.setNumWins(pl1.getNumWins()+1);
         // pl1 which is the winner takes both cards
         pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + 2);
+        winner = this->pl1.getName() + " wins!";
             
     }
 
@@ -107,6 +126,7 @@ void Game :: playTurn(){
         pl2.setNumWins(pl2.getNumWins()+1);
         // pl2 which is the winner takes both cards
         pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + 2);
+        winner = this->pl2.getName() + " wins!";
     }
 
     // Else if pl1 wins the round:
@@ -114,6 +134,7 @@ void Game :: playTurn(){
         pl1.setNumWins(pl1.getNumWins()+1);
         // pl1 which is the winner takes both cards
         pl1.setNumOfCardsWon(pl1.getNumOfCardsWon() + 2);
+        winner = this->pl1.getName() + " wins!";
     }
 
     // If pl2 wins the round:
@@ -121,11 +142,16 @@ void Game :: playTurn(){
         pl2.setNumWins(pl2.getNumWins()+1);
         // pl2 which is the winner takes both cards
         pl2.setNumOfCardsWon(pl2.getNumOfCardsWon() + 2);
+        winner = this->pl2.getName() + " wins!";
     }
         
     else {
+        winner =  " Draw!";
+        //cout << " ---------DRAW---------" << endl;
+
         vector <Card> adding; // cards that we put on table
         while (c1.getNumber() == c2.getNumber()){
+            this ->numOfDraws++;
 
             // if cannot do war
             if (this -> pl1.stacksize() < 2 && this -> pl2.stacksize() < 2 ){
@@ -145,23 +171,22 @@ void Game :: playTurn(){
             // else begin war:
             adding.push_back(c1);
             adding.push_back(c2);
-            cout << adding.size() << " adding" << endl;
+            //cout << adding.size() << " adding" << endl;
             c1 = this -> pl1.topStack();
             c2 = this -> pl2.topStack();
             adding.push_back(c1); // the upside down card
             adding.push_back(c2); // the upside down card
-            cout << adding.size() << " adding" << endl;
+            //cout << adding.size() << " adding" << endl;
             this -> pl1.popStack();
             this -> pl2.popStack();
             c1 = this -> pl1.topStack();
             c2 = this -> pl2.topStack();
             this -> pl1.popStack();
             this -> pl2.popStack();
-            cout << c1.getNumber() << " c1 and c2: " << c2.getNumber() << " " << pl1.stacksize() << endl;
+            //cout << c1.getNumber() << " c1 and c2: " << c2.getNumber() << " " << pl1.stacksize() << endl;
             adding.push_back(c1); 
             adding.push_back(c2);
-            cout << adding.size() << " adding" << endl;
-            cout << " ---------DRAW---------" << endl;
+            //cout << adding.size() << " adding" << endl;
 
 
             // Ace wins all but 2

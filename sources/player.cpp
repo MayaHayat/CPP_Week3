@@ -46,12 +46,11 @@ void Player :: setNumOfCardsWon(int num){
 }
 
 
-//------------------------------------------
+//----------- everything needs to be private therfore the following-----------------
 
 bool Player :: emptyStack(){
     return this-> playerstack.empty();
 }
-
 
 void Player :: popStack(){
     this->playerstack.pop();
